@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Mastery Quiz — CodePro AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --surface2: #1a1a24;
+    --border: #2a2a3a;
+    --accent: #00e5ff;
+    --accent2: #7c3aed;
+    --accent3: #10b981;
+    --danger: #ef4444;
+    --warn: #f59e0b;
+    --text: #e8e8f0;
+    --muted: #6b6b80;
+    --correct: #10b981;
+    --wrong: #ef4444;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Animated grid bg */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,229,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .glow-orb {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(100px);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .glow-orb.g1 { width: 500px; height: 500px; background: rgba(124,58,237,0.12); top: -150px; right: -100px; }
+  .glow-orb.g2 { width: 400px; height: 400px; background: rgba(0,229,255,0.08); bottom: 100px; left: -100px; }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 24px 20px 60px;
+  }
+
+  /* HEADER */
+  .site-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 0 32px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 40px;
+  }
+  .logo {
+    font-size: 1.1rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    font-family: 'Space Mono', monospace;
+  }
+  .logo span { color: var(--text); }
+
+  /* SCREEN TRANSITIONS */
+  .screen { display: none; animation: fadeUp 0.4s ease both; }
+  .screen.active { display: block; }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ====== NAME SCREEN ====== */
+  .hero-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .hero-tag::before { content: '//'; opacity: 0.5; }
+
+  .hero-title {
+    font-size: clamp(2.2rem, 5vw, 3.5rem);
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 16px;
+    background: linear-gradient(135deg, #fff 40%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-desc {
+    color: var(--muted);
+    font-size: 1rem;
+    line-height: 1.7;
+    max-width: 560px;
+    margin-bottom: 40px;
+  }
+
+  .stats-row {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 40px;
+  }
+  .stat-chip {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .stat-chip .num {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--accent);
+    font-family: 'Space Mono', monospace;
+  }
+  .stat-chip .lbl {
+    font-size: 0.72rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .name-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-width: 480px;
+  }
+  .field-label {
+    font-size: 0.78rem;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    display: block;
+  }
+  .name-input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .name-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(0,229,255,0.1);
+  }
+  .name-input::placeholder { color: var(--muted); }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 15px 32px;
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    transition: transform 0.15s, box-shadow 0.15s;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-primary::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent, rgba(255,255,255,0.1));
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,229,255,0.25); }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+  .btn-secondary {
+    background: var(--surface2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 13px 28px;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .btn-secondary:hover { border-color: var(--accent); background: rgba(0,229,255,0.05); }
+
+  /* Previous attempts on name screen */
+  .prev-attempts-wrap {
+    margin-top: 40px;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+  }
+  .section-label {
+    font-size: 0.72rem;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    font-family: 'Space Mono', monospace;
+  }
+  .attempt-list { display: flex; flex-direction: column; gap: 10px; }
+  .attempt-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .attempt-card .att-name { font-weight: 700; font-size: 0.95rem; }
+  .attempt-card .att-meta { font-size: 0.8rem; color: var(--muted); font-family: 'Space Mono', monospace; }
+  .att-score {
+    font-family: 'Space Mono', monospace;
+    font-size: 1rem;
+    font-weight: 700;
+    padding: 4px 14px;
+    border-radius: 20px;
+    background: rgba(0,229,255,0.1);
+    color: var(--accent);
+  }
+  .att-num {
+    font-size: 0.72rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* ====== QUIZ SCREEN ====== */
+  .quiz-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .quiz-info { display: flex; flex-direction: column; gap: 2px; }
+  .quiz-name { font-size: 0.8rem; color: var(--muted); font-family: 'Space Mono', monospace; }
+  .quiz-attempt-badge {
+    font-size: 0.72rem;
+    color: var(--accent2);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .timer-display {
+    font-family: 'Space Mono', monospace;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--accent);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 8px 20px;
+    min-width: 110px;
+    text-align: center;
+    letter-spacing: 0.1em;
+  }
+  .timer-display.warn { color: var(--warn); border-color: var(--warn); }
+
+  .progress-bar-wrap {
+    background: var(--surface2);
+    border-radius: 100px;
+    height: 6px;
+    margin-bottom: 32px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent2), var(--accent));
+    border-radius: 100px;
+    transition: width 0.4s ease;
+  }
+
+  .section-divider {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 40px 0 24px;
+  }
+  .section-divider .divider-line { flex: 1; height: 1px; background: var(--border); }
+  .section-divider .divider-label {
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    color: var(--accent);
+    text-transform: uppercase;
+    font-family: 'Space Mono', monospace;
+    white-space: nowrap;
+  }
+
+  .question-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px;
+    margin-bottom: 18px;
+    transition: border-color 0.2s;
+    position: relative;
+  }
+  .question-block:hover { border-color: rgba(0,229,255,0.2); }
+
+  .q-number {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .q-number .q-tag {
+    background: rgba(124,58,237,0.2);
+    color: var(--accent2);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.62rem;
+  }
+
+  .q-text {
+    font-size: 1rem;
+    line-height: 1.6;
+    font-weight: 600;
+    margin-bottom: 18px;
+    color: var(--text);
+  }
+
+  .options-grid { display: flex; flex-direction: column; gap: 10px; }
+  .option-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .option-label:hover { border-color: var(--accent); background: rgba(0,229,255,0.04); }
+  .option-label input[type="radio"] { display: none; }
+  .option-label.selected { border-color: var(--accent2); background: rgba(124,58,237,0.1); }
+  .option-key {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--muted);
+    background: var(--border);
+    border-radius: 5px;
+    padding: 2px 7px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .option-label.selected .option-key { background: var(--accent2); color: #fff; }
+  .option-text { font-size: 0.93rem; line-height: 1.5; }
+
+  /* Fill in blanks */
+  .blank-input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 11px 16px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.9rem;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    margin-top: 8px;
+  }
+  .blank-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,229,255,0.1); }
+
+  .submit-area {
+    margin-top: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding: 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+  }
+  .submit-status { font-size: 0.85rem; color: var(--muted); }
+  .submit-status span { color: var(--accent); font-weight: 700; font-family: 'Space Mono', monospace; }
+
+  /* ====== RESULT SCREEN ====== */
+  .result-hero {
+    text-align: center;
+    padding: 48px 0 40px;
+  }
+  .result-icon {
+    font-size: 4rem;
+    margin-bottom: 16px;
+    display: block;
+  }
+  .result-name {
+    font-size: 1.1rem;
+    color: var(--muted);
+    margin-bottom: 8px;
+    font-family: 'Space Mono', monospace;
+  }
+  .result-score-big {
+    font-size: clamp(3rem, 8vw, 5rem);
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent), var(--accent3));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+    margin-bottom: 8px;
+    font-family: 'Space Mono', monospace;
+  }
+  .result-out-of { color: var(--muted); font-size: 1rem; margin-bottom: 24px; }
+  .result-time-display {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 8px 20px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.9rem;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+  .result-attempt-label {
+    font-size: 0.78rem;
+    color: var(--accent2);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 40px;
+  }
+
+  .result-breakdown {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
+    margin-bottom: 40px;
+  }
+  .breakdown-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+  }
+  .breakdown-card .b-num {
+    font-size: 2rem;
+    font-weight: 800;
+    font-family: 'Space Mono', monospace;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .breakdown-card .b-lbl { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
+  .b-correct { color: var(--correct); }
+  .b-wrong { color: var(--wrong); }
+  .b-pct { color: var(--accent); }
+
+  .all-attempts-section { margin-bottom: 40px; }
+  .attempt-history-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .attempt-history-card.current { border-color: var(--accent2); }
+  .att-h-left { display: flex; flex-direction: column; gap: 3px; }
+  .att-h-num { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
+  .att-h-num.curr { color: var(--accent2); }
+  .att-h-name { font-weight: 700; }
+  .att-h-right { display: flex; align-items: center; gap: 16px; }
+  .att-h-score {
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--accent);
+  }
+  .att-h-time { font-family: 'Space Mono', monospace; font-size: 0.8rem; color: var(--muted); }
+
+  .result-actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+
+  /* Answered indicator dot */
+  .q-answered-dot {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent3);
+    display: none;
+  }
+  .question-block.answered .q-answered-dot { display: block; }
+
+  /* Result review */
+  .review-section { margin-top: 40px; }
+  .review-q {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 12px;
+  }
+  .review-q.correct-q { border-left: 3px solid var(--correct); }
+  .review-q.wrong-q { border-left: 3px solid var(--wrong); }
+  .review-q.skip-q { border-left: 3px solid var(--muted); }
+  .review-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; font-family: 'Space Mono', monospace; }
+  .review-label.c { color: var(--correct); }
+  .review-label.w { color: var(--wrong); }
+  .review-label.s { color: var(--muted); }
+  .review-q-text { font-size: 0.93rem; font-weight: 600; margin-bottom: 10px; }
+  .review-answers { display: flex; flex-direction: column; gap: 4px; font-size: 0.82rem; font-family: 'Space Mono', monospace; }
+  .review-your { color: var(--wrong); }
+  .review-correct-ans { color: var(--correct); }
+  .review-your.match { color: var(--correct); }
+
+  .toggle-review-btn {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.9rem;
+    color: var(--muted);
+    cursor: pointer;
+    margin-bottom: 16px;
+    transition: border-color 0.2s, color 0.2s;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+  }
+  .toggle-review-btn:hover { border-color: var(--accent); color: var(--text); }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    .stats-row { gap: 12px; }
+    .submit-area { flex-direction: column; align-items: stretch; }
+    .result-actions { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+<div class="glow-orb g1"></div>
+<div class="glow-orb g2"></div>
+
+<div class="container">
+  <header class="site-header">
+    <div class="logo">CODE<span>PRO</span></div>
+    <div style="font-size:0.75rem;color:var(--muted);font-family:'Space Mono',monospace;">Python Mastery Quiz</div>
+  </header>
+
+  <!-- ==================== NAME SCREEN ==================== -->
+  <div class="screen active" id="screen-name">
+    <div class="hero-tag">Assessment Portal</div>
+    <h1 class="hero-title">Python<br>Mastery Quiz</h1>
+    <p class="hero-desc">Test your knowledge across 6 modules — Python Fundamentals, Data Handling, Automation, AI Foundations, Web Scraping, and Problem Solving. 50 questions, timed.</p>
+
+    <div class="stats-row">
+      <div class="stat-chip"><span class="num">25</span><span class="lbl">MCQ Questions</span></div>
+      <div class="stat-chip"><span class="num">25</span><span class="lbl">Fill in Blanks</span></div>
+      <div class="stat-chip"><span class="num">50</span><span class="lbl">Total Marks</span></div>
+      <div class="stat-chip"><span class="num">∞</span><span class="lbl">Attempts</span></div>
+    </div>
+
+    <div class="name-form">
+      <div>
+        <label class="field-label" for="nameInput">Your Full Name</label>
+        <input class="name-input" id="nameInput" type="text" placeholder="e.g. Ahmed Ali" maxlength="60" />
+      </div>
+      <button class="btn-primary" id="startBtn" onclick="startQuiz()">Start Quiz →</button>
+    </div>
+
+    <div class="prev-attempts-wrap" id="prevAttemptsWrap" style="display:none;">
+      <div class="section-label">// Previous Attempts (All Users)</div>
+      <div class="attempt-list" id="prevAttemptsList"></div>
+    </div>
+  </div>
+
+  <!-- ==================== QUIZ SCREEN ==================== -->
+  <div class="screen" id="screen-quiz">
+    <div class="quiz-topbar">
+      <div class="quiz-info">
+        <div class="quiz-name" id="quizUserName"></div>
+        <div class="quiz-attempt-badge" id="quizAttemptBadge"></div>
+      </div>
+      <div class="timer-display" id="timerDisplay">00:00</div>
+    </div>
+
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
+    </div>
+
+    <div id="questionsContainer"></div>
+
+    <div class="submit-area">
+      <div class="submit-status">Answered: <span id="answeredCount">0</span> / 50</div>
+      <button class="btn-primary" onclick="submitQuiz()">Submit Test →</button>
+    </div>
+  </div>
+
+  <!-- ==================== RESULT SCREEN ==================== -->
+  <div class="screen" id="screen-result">
+    <div class="result-hero">
+      <span class="result-icon" id="resultIcon">🎯</span>
+      <div class="result-name" id="resultName"></div>
+      <div class="result-score-big" id="resultScore"></div>
+      <div class="result-out-of">out of 50 marks</div>
+      <div class="result-time-display">⏱ <span id="resultTime"></span></div>
+      <div class="result-attempt-label" id="resultAttemptLabel"></div>
+    </div>
+
+    <div class="result-breakdown">
+      <div class="breakdown-card"><div class="b-num b-correct" id="rdCorrect">0</div><div class="b-lbl">Correct</div></div>
+      <div class="breakdown-card"><div class="b-num b-wrong" id="rdWrong">0</div><div class="b-lbl">Wrong</div></div>
+      <div class="breakdown-card"><div class="b-num" style="color:var(--muted)" id="rdSkip">0</div><div class="b-lbl">Skipped</div></div>
+      <div class="breakdown-card"><div class="b-num b-pct" id="rdPct">0%</div><div class="b-lbl">Percentage</div></div>
+    </div>
+
+    <div class="all-attempts-section">
+      <div class="section-label">// Attempt History</div>
+      <div id="attemptHistoryList"></div>
+    </div>
+
+    <div class="result-actions">
+      <button class="btn-primary" onclick="retakeQuiz()">Retake Quiz →</button>
+      <button class="btn-secondary" onclick="goHome()">← Home</button>
+    </div>
+
+    <div class="review-section">
+      <button class="toggle-review-btn" onclick="toggleReview(this)">📋 Show Answer Review</button>
+      <div id="reviewContainer" style="display:none;"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ====================== QUESTION BANK ======================
+const MCQ = [
+  {q:"What is the correct file extension for Python files?", opts:["A) .py","B) .pt","C) .python","D) .pyt"], ans:"A"},
+  {q:"Which keyword is used to define a function in Python?", opts:["A) function","B) def","C) define","D) fun"], ans:"B"},
+  {q:"What is the output of: print(2 ** 3)?", opts:["A) 6","B) 8","C) 9","D) 23"], ans:"B"},
+  {q:"Which of the following is a mutable data type in Python?", opts:["A) Tuple","B) String","C) List","D) Integer"], ans:"C"},
+  {q:"What does the `len()` function return for a list?", opts:["A) Sum of elements","B) Number of elements","C) Last element","D) Max element"], ans:"B"},
+  {q:"Which loop is used when the number of iterations is not known?", opts:["A) for","B) while","C) do-while","D) foreach"], ans:"B"},
+  {q:"What is the output of: type(3.14)?", opts:["A) int","B) str","C) float","D) double"], ans:"C"},
+  {q:"How do you start a comment in Python?", opts:["A) //","B) /* */","C) #","D) --"], ans:"C"},
+  {q:"Which method is used to add an element at the end of a list?", opts:["A) add()","B) insert()","C) push()","D) append()"], ans:"D"},
+  {q:"What does a dictionary store?", opts:["A) Only integers","B) Key-value pairs","C) Ordered sequences","D) Sets of unique values"], ans:"B"},
+  {q:"Which keyword is used to open a file in Python?", opts:["A) open()","B) file()","C) read()","D) load()"], ans:"A"},
+  {q:"What module is used for working with the operating system in Python?", opts:["A) sys","B) os","C) file","D) path"], ans:"B"},
+  {q:"Which library is primarily used for data manipulation in AI/ML?", opts:["A) NumPy","B) Pandas","C) SciKit-Learn","D) Both A and B"], ans:"D"},
+  {q:"What is BeautifulSoup used for?", opts:["A) Making HTTP requests","B) Parsing HTML and XML","C) Sending emails","D) Automating files"], ans:"B"},
+  {q:"Which Python library is used for making HTTP requests?", opts:["A) requests","B) http","C) urllib2","D) socket"], ans:"A"},
+  {q:"A tuple is different from a list because it is:", opts:["A) Faster to iterate","B) Immutable","C) Ordered","D) Indexed"], ans:"B"},
+  {q:"What does SMTP stand for in email automation?", opts:["A) Simple Mail Transfer Protocol","B) Secure Message Transfer Protocol","C) Standard Mail Transmission Protocol","D) System Mail Task Protocol"], ans:"A"},
+  {q:"Which NumPy function creates an array of zeros?", opts:["A) np.empty()","B) np.zeros()","C) np.null()","D) np.blank()"], ans:"B"},
+  {q:"In web scraping, which tag usually contains links in HTML?", opts:["A) <div>","B) <p>","C) <a>","D) <span>"], ans:"C"},
+  {q:"What is the correct syntax to read all lines from a file?", opts:["A) file.read()","B) file.readline()","C) file.readlines()","D) file.lines()"], ans:"C"},
+  {q:"Which Python keyword is used to handle exceptions?", opts:["A) catch","B) handle","C) except","D) error"], ans:"C"},
+  {q:"What does `os.rename()` do?", opts:["A) Deletes a file","B) Renames a file","C) Moves a file","D) Copies a file"], ans:"B"},
+  {q:"In machine learning, SciKit-Learn is used for:", opts:["A) Web scraping","B) Building and training models","C) Database management","D) Image rendering"], ans:"B"},
+  {q:"Which method removes a key-value pair from a dictionary?", opts:["A) remove()","B) delete()","C) pop()","D) discard()"], ans:"C"},
+  {q:"What does the `range(1, 6)` function produce?", opts:["A) 1 2 3 4 5 6","B) 1 2 3 4 5","C) 0 1 2 3 4 5","D) 2 3 4 5 6"], ans:"B"},
+];
+
+const FIB = [
+  {q:"The process of automatically extracting data from websites is called ___.", ans:"web scraping"},
+  {q:"In Python, a ___ is an immutable ordered sequence of elements.", ans:"tuple"},
+  {q:"The keyword used to exit a loop prematurely in Python is ___.", ans:"break"},
+  {q:"A Python ___ is a collection of key-value pairs enclosed in curly braces.", ans:"dictionary"},
+  {q:"The Python module used for sending emails is ___.", ans:"smtplib"},
+  {q:"___ is the NumPy function used to compute the mean of an array.", ans:"np.mean"},
+  {q:"To open a file in write mode in Python, you pass ___ as the second argument to open().", ans:"'w'"},
+  {q:"The BeautifulSoup method used to find the first matching tag is ___.", ans:"find"},
+  {q:"In Python, the ___ keyword is used to define a class.", ans:"class"},
+  {q:"The Pandas data structure for tabular data is called a ___.", ans:"DataFrame"},
+  {q:"A ___ loop runs as long as a condition remains True.", ans:"while"},
+  {q:"The file mode ___ opens a file for both reading and writing.", ans:"'r+'"},
+  {q:"In Python, ___ is used to iterate over both index and value in a list.", ans:"enumerate"},
+  {q:"The os module function to list files in a directory is ___.", ans:"os.listdir"},
+  {q:"In machine learning, splitting data into training and test sets is done using ___.", ans:"train_test_split"},
+  {q:"The Python function that returns the number of items in a list is ___.", ans:"len"},
+  {q:"Web scraping must consider ___ guidelines to access websites legally.", ans:"robots.txt"},
+  {q:"In Python, a function that calls itself is called a ___ function.", ans:"recursive"},
+  {q:"The library used for numerical computations in Python is ___.", ans:"NumPy"},
+  {q:"To delete a file using the os module, you call ___.", ans:"os.remove"},
+  {q:"The Python ___ statement is used to skip the current iteration of a loop.", ans:"continue"},
+  {q:"In a dictionary, values are accessed using their ___.", ans:"keys"},
+  {q:"The HTML tag that stores tabular data rows is ___.", ans:"<tr>"},
+  {q:"A list comprehension is written inside ___ brackets.", ans:"square"},
+  {q:"The Python built-in function to convert a string to an integer is ___.", ans:"int"},
+];
+
+// Build full question list
+const ALL_QUESTIONS = [
+  ...MCQ.map((q,i) => ({...q, type:'mcq', id:i})),
+  ...FIB.map((q,i) => ({...q, type:'fib', id:i+25}))
+];
+
+// ====================== STATE ======================
+let timerInterval = null;
+let secondsElapsed = 0;
+let currentUser = '';
+let currentAttemptNum = 1;
+let userAnswers = {};
+
+// ====================== STORAGE HELPERS ======================
+const STORAGE_KEY = 'pyquiz_attempts';
+
+function loadAttempts() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+  catch(e) { return []; }
+}
+function saveAttempts(arr) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+}
+
+// ====================== HOME SCREEN ======================
+function renderHome() {
+  const attempts = loadAttempts();
+  const wrap = document.getElementById('prevAttemptsWrap');
+  const list = document.getElementById('prevAttemptsList');
+  if (attempts.length === 0) { wrap.style.display = 'none'; return; }
+  wrap.style.display = 'block';
+  list.innerHTML = attempts.slice().reverse().slice(0,10).map(a => `
+    <div class="attempt-card">
+      <div>
+        <div class="att-name">${escHtml(a.name)}</div>
+        <div class="att-meta">${a.date} &nbsp;·&nbsp; ${formatTime(a.seconds)}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div class="att-num">${ordinal(a.attemptNum)} Attempt</div>
+        <div class="att-score">${a.score}/50</div>
+      </div>
+    </div>
+  `).join('');
+}
+renderHome();
+
+document.getElementById('nameInput').addEventListener('keydown', e => { if(e.key==='Enter') startQuiz(); });
+
+function startQuiz() {
+  const name = document.getElementById('nameInput').value.trim();
+  if (!name) { document.getElementById('nameInput').focus(); return; }
+  currentUser = name;
+  userAnswers = {};
+  secondsElapsed = 0;
+
+  // Calculate attempt number for this user
+  const attempts = loadAttempts();
+  const userAttempts = attempts.filter(a => a.name.toLowerCase() === name.toLowerCase());
+  currentAttemptNum = userAttempts.length + 1;
+
+  showScreen('screen-quiz');
+  renderQuiz();
+  startTimer();
+}
+
+// ====================== QUIZ SCREEN ======================
+function renderQuiz() {
+  document.getElementById('quizUserName').textContent = currentUser;
+  document.getElementById('quizAttemptBadge').textContent = `${ordinal(currentAttemptNum)} Attempt`;
+  updateProgress();
+
+  const container = document.getElementById('questionsContainer');
+  let html = '';
+
+  // MCQ section
+  html += `<div class="section-divider"><div class="divider-line"></div><div class="divider-label">// Section A — Multiple Choice Questions (MCQ)</div><div class="divider-line"></div></div>`;
+  MCQ.forEach((q,i) => {
+    html += `
+    <div class="question-block" id="qblock-${i}">
+      <div class="q-answered-dot"></div>
+      <div class="q-number"><span class="q-tag">MCQ</span> Question ${i+1} of 25</div>
+      <div class="q-text">${i+1}. ${escHtml(q.q)}</div>
+      <div class="options-grid">
+        ${q.opts.map((opt,oi) => {
+          const key = ['A','B','C','D'][oi];
+          return `<label class="option-label" id="opt-${i}-${key}" onclick="selectMCQ(${i},'${key}')">
+            <input type="radio" name="mcq-${i}" value="${key}">
+            <span class="option-key">${key}</span>
+            <span class="option-text">${escHtml(opt.substring(3))}</span>
+          </label>`;
+        }).join('')}
+      </div>
+    </div>`;
+  });
+
+  // FIB section
+  html += `<div class="section-divider"><div class="divider-line"></div><div class="divider-label">// Section B — Fill in the Blanks</div><div class="divider-line"></div></div>`;
+  FIB.forEach((q,i) => {
+    const idx = i+25;
+    html += `
+    <div class="question-block" id="qblock-${idx}">
+      <div class="q-answered-dot"></div>
+      <div class="q-number"><span class="q-tag" style="background:rgba(0,229,255,0.15);color:var(--accent);">FIB</span> Question ${i+1} of 25</div>
+      <div class="q-text">${i+26}. ${escHtml(q.q)}</div>
+      <input class="blank-input" type="text" placeholder="Type your answer here..." id="fib-${idx}"
+        oninput="saveFIB(${idx}, this.value)" autocomplete="off" />
+    </div>`;
+  });
+
+  container.innerHTML = html;
+  updateAnsweredCount();
+}
+
+function selectMCQ(qIdx, key) {
+  // Deselect all
+  ['A','B','C','D'].forEach(k => {
+    const el = document.getElementById(`opt-${qIdx}-${k}`);
+    if(el) el.classList.remove('selected');
+  });
+  document.getElementById(`opt-${qIdx}-${key}`).classList.add('selected');
+  userAnswers[qIdx] = key;
+  document.getElementById(`qblock-${qIdx}`).classList.add('answered');
+  updateAnsweredCount();
+}
+
+function saveFIB(qIdx, value) {
+  userAnswers[qIdx] = value;
+  const block = document.getElementById(`qblock-${qIdx}`);
+  if (value.trim()) block.classList.add('answered');
+  else block.classList.remove('answered');
+  updateAnsweredCount();
+}
+
+function updateAnsweredCount() {
+  const count = Object.keys(userAnswers).filter(k => {
+    const v = userAnswers[k];
+    return v !== undefined && v !== '';
+  }).length;
+  document.getElementById('answeredCount').textContent = count;
+  updateProgress();
+}
+
+function updateProgress() {
+  const count = Object.keys(userAnswers).filter(k => userAnswers[k] !== '').length;
+  document.getElementById('progressFill').style.width = `${(count/50)*100}%`;
+}
+
+// ====================== TIMER ======================
+function startTimer() {
+  secondsElapsed = 0;
+  clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    secondsElapsed++;
+    const el = document.getElementById('timerDisplay');
+    el.textContent = formatTime(secondsElapsed);
+    el.classList.toggle('warn', secondsElapsed > 3600);
+  }, 1000);
+}
+
+function formatTime(sec) {
+  const h = Math.floor(sec/3600);
+  const m = Math.floor((sec%3600)/60);
+  const s = sec%60;
+  if(h>0) return `${pad(h)}:${pad(m)}:${pad(s)}`;
+  return `${pad(m)}:${pad(s)}`;
+}
+function pad(n) { return String(n).padStart(2,'0'); }
+
+// ====================== SUBMIT ======================
+function submitQuiz() {
+  const answered = Object.keys(userAnswers).filter(k => userAnswers[k] !== '').length;
+  if (answered < 50) {
+    const left = 50 - answered;
+    if (!confirm(`You have ${left} unanswered question(s). Submit anyway?`)) return;
+  }
+  clearInterval(timerInterval);
+  const timeTaken = secondsElapsed;
+
+  // Grade
+  let correct = 0;
+  MCQ.forEach((q,i) => {
+    if (userAnswers[i] === q.ans) correct++;
+  });
+  FIB.forEach((q,i) => {
+    const idx = i+25;
+    const given = (userAnswers[idx] || '').trim().toLowerCase();
+    const expected = q.ans.toLowerCase().replace(/['"]/g,'');
+    if (given === expected || given === expected.replace(/['"]/g,'')) correct++;
+  });
+
+  const score = correct;
+  const wrong = Object.keys(userAnswers).filter(k => userAnswers[k] !== '').length - correct;
+  const skip = 50 - Object.keys(userAnswers).filter(k => userAnswers[k] !== '').length;
+
+  // Save attempt
+  const attempts = loadAttempts();
+  const now = new Date();
+  const attemptData = {
+    name: currentUser,
+    score,
+    seconds: timeTaken,
+    date: now.toLocaleDateString('en-PK', {day:'numeric', month:'short', year:'numeric'}),
+    attemptNum: currentAttemptNum,
+    answers: {...userAnswers},
+    timestamp: now.getTime()
+  };
+  attempts.push(attemptData);
+  saveAttempts(attempts);
+
+  // Show result
+  showResult(score, wrong, skip, timeTaken, currentAttemptNum, attempts);
+}
+
+// ====================== RESULTS ======================
+function showResult(score, wrong, skip, timeTaken, attemptNum, allAttempts) {
+  showScreen('screen-result');
+
+  const pct = Math.round((score/50)*100);
+  let icon = pct >= 80 ? '🏆' : pct >= 60 ? '🎯' : pct >= 40 ? '📚' : '💪';
+
+  document.getElementById('resultIcon').textContent = icon;
+  document.getElementById('resultName').textContent = currentUser;
+  document.getElementById('resultScore').textContent = score;
+  document.getElementById('resultTime').textContent = formatTime(timeTaken);
+  document.getElementById('resultAttemptLabel').textContent = `${ordinal(attemptNum)} Attempt`;
+  document.getElementById('rdCorrect').textContent = score;
+  document.getElementById('rdWrong').textContent = wrong;
+  document.getElementById('rdSkip').textContent = skip;
+  document.getElementById('rdPct').textContent = `${pct}%`;
+
+  // Attempt history
+  const userAttempts = allAttempts.filter(a => a.name.toLowerCase() === currentUser.toLowerCase());
+  const histList = document.getElementById('attemptHistoryList');
+  histList.innerHTML = userAttempts.map((a,i) => {
+    const isCurrent = a.timestamp === allAttempts[allAttempts.length-1].timestamp && i === userAttempts.length-1;
+    return `<div class="attempt-history-card ${isCurrent?'current':''}">
+      <div class="att-h-left">
+        <div class="att-h-num ${isCurrent?'curr':''}">${ordinal(a.attemptNum)} Attempt ${isCurrent?'(Just Now)':''}</div>
+        <div class="att-h-name">${escHtml(a.name)}</div>
+        <div style="font-size:0.75rem;color:var(--muted);font-family:'Space Mono',monospace;">${a.date}</div>
+      </div>
+      <div class="att-h-right">
+        <div class="att-h-time">${formatTime(a.seconds)}</div>
+        <div class="att-h-score">${a.score}/50</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Build review
+  buildReview();
+}
+
+function buildReview() {
+  const container = document.getElementById('reviewContainer');
+  let html = '';
+  MCQ.forEach((q,i) => {
+    const given = userAnswers[i];
+    const correct = given === q.ans;
+    const skipped = !given;
+    html += `<div class="review-q ${skipped?'skip-q':correct?'correct-q':'wrong-q'}">
+      <div class="review-label ${skipped?'s':correct?'c':'w'}">${skipped?'SKIPPED':correct?'CORRECT':'WRONG'} — MCQ Q${i+1}</div>
+      <div class="review-q-text">${i+1}. ${escHtml(q.q)}</div>
+      <div class="review-answers">
+        ${!skipped ? `<span class="review-your ${correct?'match':''}">Your answer: ${given} — ${escHtml(q.opts[['A','B','C','D'].indexOf(given)]?.substring(3)||'')}</span>` : ''}
+        ${!correct ? `<span class="review-correct-ans">Correct: ${q.ans} — ${escHtml(q.opts[['A','B','C','D'].indexOf(q.ans)]?.substring(3)||'')}</span>` : ''}
+      </div>
+    </div>`;
+  });
+  FIB.forEach((q,i) => {
+    const idx = i+25;
+    const given = (userAnswers[idx]||'').trim();
+    const expected = q.ans;
+    const correct = given.toLowerCase() === expected.toLowerCase().replace(/['"]/g,'');
+    const skipped = !given;
+    html += `<div class="review-q ${skipped?'skip-q':correct?'correct-q':'wrong-q'}">
+      <div class="review-label ${skipped?'s':correct?'c':'w'}">${skipped?'SKIPPED':correct?'CORRECT':'WRONG'} — FIB Q${i+1}</div>
+      <div class="review-q-text">${i+26}. ${escHtml(q.q)}</div>
+      <div class="review-answers">
+        ${!skipped ? `<span class="review-your ${correct?'match':''}">Your answer: ${escHtml(given)}</span>` : ''}
+        ${!correct ? `<span class="review-correct-ans">Correct answer: ${escHtml(expected)}</span>` : ''}
+      </div>
+    </div>`;
+  });
+  container.innerHTML = html;
+}
+
+function toggleReview(btn) {
+  const rc = document.getElementById('reviewContainer');
+  const shown = rc.style.display === 'block';
+  rc.style.display = shown ? 'none' : 'block';
+  btn.textContent = shown ? '📋 Show Answer Review' : '🔼 Hide Answer Review';
+}
+
+// ====================== NAVIGATION ======================
+function retakeQuiz() {
+  userAnswers = {};
+  secondsElapsed = 0;
+  currentAttemptNum++;
+  showScreen('screen-quiz');
+  renderQuiz();
+  startTimer();
+}
+
+function goHome() {
+  clearInterval(timerInterval);
+  document.getElementById('nameInput').value = '';
+  renderHome();
+  showScreen('screen-name');
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+// ====================== UTILS ======================
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function ordinal(n) {
+  const s = ['th','st','nd','rd'], v = n%100;
+  return n + (s[(v-20)%10] || s[v] || s[0]);
+}
+</script>
+</body>
+</html>
