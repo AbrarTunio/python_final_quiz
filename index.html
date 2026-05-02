@@ -580,6 +580,53 @@
   }
   .toggle-review-btn:hover { border-color: var(--accent); color: var(--text); }
 
+  /* Code block for FIB questions */
+  .code-block {
+    background: #0d0d14;
+    border: 1px solid #1e1e30;
+    border-left: 3px solid var(--accent);
+    border-radius: 10px;
+    padding: 18px 20px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.88rem;
+    line-height: 2.2;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    overflow-x: auto;
+    margin-top: 12px;
+  }
+  .code-line {
+    display: block;
+    white-space: pre;
+    color: #c9d1d9;
+  }
+  .code-dim { color: var(--muted); }
+  .inline-blank {
+    display: inline-block;
+    background: rgba(0,229,255,0.08);
+    border: 1.5px dashed var(--accent);
+    border-radius: 5px;
+    padding: 1px 8px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.88rem;
+    color: var(--accent);
+    outline: none;
+    width: auto;
+    min-width: 80px;
+    max-width: 220px;
+    vertical-align: middle;
+    transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+    line-height: 1.6;
+  }
+  .inline-blank:focus {
+    border-style: solid;
+    border-color: var(--accent);
+    background: rgba(0,229,255,0.14);
+    box-shadow: 0 0 0 3px rgba(0,229,255,0.12);
+  }
+  .inline-blank::placeholder { color: rgba(0,229,255,0.35); font-style: italic; }
+
   /* Responsive */
   @media (max-width: 600px) {
     .stats-row { gap: 12px; }
@@ -712,32 +759,135 @@ const MCQ = [
   {q:"What does the `range(1, 6)` function produce?", opts:["A) 1 2 3 4 5 6","B) 1 2 3 4 5","C) 0 1 2 3 4 5","D) 2 3 4 5 6"], ans:"B"},
 ];
 
+// FIB format: label = question text above code block
+// code = the code with @@BLANK@@ marking where the input goes
+// ans = the correct answer (case-insensitive match)
 const FIB = [
-  {q:"The process of automatically extracting data from websites is called ___.", ans:"web scraping"},
-  {q:"In Python, a ___ is an immutable ordered sequence of elements.", ans:"tuple"},
-  {q:"The keyword used to exit a loop prematurely in Python is ___.", ans:"break"},
-  {q:"A Python ___ is a collection of key-value pairs enclosed in curly braces.", ans:"dictionary"},
-  {q:"The Python module used for sending emails is ___.", ans:"smtplib"},
-  {q:"___ is the NumPy function used to compute the mean of an array.", ans:"np.mean"},
-  {q:"To open a file in write mode in Python, you pass ___ as the second argument to open().", ans:"'w'"},
-  {q:"The BeautifulSoup method used to find the first matching tag is ___.", ans:"find"},
-  {q:"In Python, the ___ keyword is used to define a class.", ans:"class"},
-  {q:"The Pandas data structure for tabular data is called a ___.", ans:"DataFrame"},
-  {q:"A ___ loop runs as long as a condition remains True.", ans:"while"},
-  {q:"The file mode ___ opens a file for both reading and writing.", ans:"'r+'"},
-  {q:"In Python, ___ is used to iterate over both index and value in a list.", ans:"enumerate"},
-  {q:"The os module function to list files in a directory is ___.", ans:"os.listdir"},
-  {q:"In machine learning, splitting data into training and test sets is done using ___.", ans:"train_test_split"},
-  {q:"The Python function that returns the number of items in a list is ___.", ans:"len"},
-  {q:"Web scraping must consider ___ guidelines to access websites legally.", ans:"robots.txt"},
-  {q:"In Python, a function that calls itself is called a ___ function.", ans:"recursive"},
-  {q:"The library used for numerical computations in Python is ___.", ans:"NumPy"},
-  {q:"To delete a file using the os module, you call ___.", ans:"os.remove"},
-  {q:"The Python ___ statement is used to skip the current iteration of a loop.", ans:"continue"},
-  {q:"In a dictionary, values are accessed using their ___.", ans:"keys"},
-  {q:"The HTML tag that stores tabular data rows is ___.", ans:"<tr>"},
-  {q:"A list comprehension is written inside ___ brackets.", ans:"square"},
-  {q:"The Python built-in function to convert a string to an integer is ___.", ans:"int"},
+  {
+    label: "Fill in the blank to print Hello World:",
+    code: `@@BLANK@@("Hello World")`,
+    ans: "print"
+  },
+  {
+    label: "Fill in the blank to define a function called greet:",
+    code: `@@BLANK@@ greet():\n    print("Hello!")`,
+    ans: "def"
+  },
+  {
+    label: "Fill in the blank to store the number 10 in a variable:",
+    code: `@@BLANK@@ = 10\nprint(num)`,
+    ans: "num"
+  },
+  {
+    label: "Fill in the blank to create a list of fruits:",
+    code: `fruits = @@BLANK@@["apple", "mango", "banana"]`,
+    ans: "[]"
+  },
+  {
+    label: "Fill in the blank to add 'orange' to the list:",
+    code: `fruits = ["apple", "mango"]\nfruits.@@BLANK@@("orange")`,
+    ans: "append"
+  },
+  {
+    label: "Fill in the blank to loop through numbers 1 to 5:",
+    code: `for i in @@BLANK@@(1, 6):\n    print(i)`,
+    ans: "range"
+  },
+  {
+    label: "Fill in the blank to check if x is greater than 10:",
+    code: `x = 15\n@@BLANK@@ x > 10:\n    print("Big number")`,
+    ans: "if"
+  },
+  {
+    label: "Fill in the blank to get the number of items in a list:",
+    code: `my_list = [1, 2, 3, 4]\nprint(@@BLANK@@(my_list))`,
+    ans: "len"
+  },
+  {
+    label: "Fill in the blank to create a dictionary:",
+    code: `student = @@BLANK@@"name": "Ali", "age": 20@@BLANK@@`,
+    ans: "{}"
+  },
+  {
+    label: "Fill in the blank to access the value of key 'name':",
+    code: `student = {"name": "Ali", "age": 20}\nprint(student[@@BLANK@@])`,
+    ans: '"name"'
+  },
+  {
+    label: "Fill in the blank to open a file for reading:",
+    code: `file = open("data.txt", @@BLANK@@)\ncontent = file.read()`,
+    ans: '"r"'
+  },
+  {
+    label: "Fill in the blank to write text into a file:",
+    code: `file = open("output.txt", "w")\nfile.@@BLANK@@("Hello File!")`,
+    ans: "write"
+  },
+  {
+    label: "Fill in the blank to import the os module:",
+    code: `@@BLANK@@ os\nos.rename("old.txt", "new.txt")`,
+    ans: "import"
+  },
+  {
+    label: "Fill in the blank to delete a file using os module:",
+    code: `import os\nos.@@BLANK@@("unwanted.txt")`,
+    ans: "remove"
+  },
+  {
+    label: "Fill in the blank to create a tuple:",
+    code: `colors = @@BLANK@@"red", "green", "blue"@@BLANK@@`,
+    ans: "()"
+  },
+  {
+    label: "Fill in the blank to import the requests library:",
+    code: `@@BLANK@@ requests\nresponse = requests.get("https://example.com")`,
+    ans: "import"
+  },
+  {
+    label: "Fill in the blank to parse HTML with BeautifulSoup:",
+    code: `from bs4 import BeautifulSoup\nsoup = BeautifulSoup(html, @@BLANK@@)`,
+    ans: '"html.parser"'
+  },
+  {
+    label: "Fill in the blank to import pandas:",
+    code: `@@BLANK@@ pandas as pd\ndf = pd.read_csv("data.csv")`,
+    ans: "import"
+  },
+  {
+    label: "Fill in the blank to create a NumPy array:",
+    code: `import numpy as np\narr = np.@@BLANK@@([1, 2, 3, 4])`,
+    ans: "array"
+  },
+  {
+    label: "Fill in the blank to use a while loop:",
+    code: `count = 0\n@@BLANK@@ count < 5:\n    print(count)\n    count += 1`,
+    ans: "while"
+  },
+  {
+    label: "Fill in the blank to handle an exception:",
+    code: `try:\n    x = 10 / 0\n@@BLANK@@ ZeroDivisionError:\n    print("Cannot divide by zero")`,
+    ans: "except"
+  },
+  {
+    label: "Fill in the blank to return a value from a function:",
+    code: `def square(n):\n    @@BLANK@@ n * n`,
+    ans: "return"
+  },
+  {
+    label: "Fill in the blank to remove a key from a dictionary:",
+    code: `student = {"name": "Ali", "age": 20}\nstudent.@@BLANK@@("age")`,
+    ans: "pop"
+  },
+  {
+    label: "Fill in the blank to get all links from a webpage:",
+    code: `links = soup.find_all(@@BLANK@@)\nfor link in links:\n    print(link.get("href"))`,
+    ans: '"a"'
+  },
+  {
+    label: "Fill in the blank to skip the current loop iteration:",
+    code: `for i in range(10):\n    if i == 5:\n        @@BLANK@@\n    print(i)`,
+    ans: "continue"
+  },
 ];
 
 // Build full question list
@@ -836,21 +986,35 @@ function renderQuiz() {
   });
 
   // FIB section
-  html += `<div class="section-divider"><div class="divider-line"></div><div class="divider-label">// Section B — Fill in the Blanks</div><div class="divider-line"></div></div>`;
+  html += `<div class="section-divider"><div class="divider-line"></div><div class="divider-label">// Section B — Complete the Program</div><div class="divider-line"></div></div>`;
   FIB.forEach((q,i) => {
     const idx = i+25;
+    const codeHtml = renderCodeWithBlank(q.code, idx);
     html += `
     <div class="question-block" id="qblock-${idx}">
       <div class="q-answered-dot"></div>
-      <div class="q-number"><span class="q-tag" style="background:rgba(0,229,255,0.15);color:var(--accent);">FIB</span> Question ${i+1} of 25</div>
-      <div class="q-text">${i+26}. ${escHtml(q.q)}</div>
-      <input class="blank-input" type="text" placeholder="Type your answer here..." id="fib-${idx}"
-        oninput="saveFIB(${idx}, this.value)" autocomplete="off" />
+      <div class="q-number"><span class="q-tag" style="background:rgba(0,229,255,0.15);color:var(--accent);">CODE</span> Question ${i+1} of 25</div>
+      <div class="q-text">${i+26}. ${escHtml(q.label)}</div>
+      <div class="code-block">${codeHtml}</div>
     </div>`;
   });
 
   container.innerHTML = html;
   updateAnsweredCount();
+}
+
+function renderCodeWithBlank(code, idx) {
+  const lines = code.split('\n');
+  return lines.map(line => {
+    if (line.includes("@@BLANK@@")) {
+      const parts = line.split("@@BLANK@@");
+      if (parts.length === 3) {
+        return `<span class="code-line">${escHtml(parts[0])}<input class="inline-blank" id="fib-${idx}" oninput="saveFIB(${idx}, this.value)" autocomplete="off" placeholder="?" spellcheck="false" /></span>`;
+      }
+      return `<span class="code-line">${escHtml(parts[0])}<input class="inline-blank" id="fib-${idx}" oninput="saveFIB(${idx}, this.value)" autocomplete="off" placeholder="?" spellcheck="false" />${escHtml(parts[1]||"")}</span>`;
+    }
+    return `<span class="code-line">${escHtml(line)}</span>`;
+  }).join("");
 }
 
 function selectMCQ(qIdx, key) {
@@ -925,9 +1089,9 @@ function submitQuiz() {
   });
   FIB.forEach((q,i) => {
     const idx = i+25;
-    const given = (userAnswers[idx] || '').trim().toLowerCase();
+    const given = (userAnswers[idx] || '').trim().toLowerCase().replace(/['"]/g,'');
     const expected = q.ans.toLowerCase().replace(/['"]/g,'');
-    if (given === expected || given === expected.replace(/['"]/g,'')) correct++;
+    if (given === expected) correct++;
   });
 
   const score = correct;
@@ -1012,11 +1176,12 @@ function buildReview() {
     const idx = i+25;
     const given = (userAnswers[idx]||'').trim();
     const expected = q.ans;
-    const correct = given.toLowerCase() === expected.toLowerCase().replace(/['"]/g,'');
+    const correct = given.toLowerCase().replace(/['"]/g,'') === expected.toLowerCase().replace(/['"]/g,'');
     const skipped = !given;
+    const codePreview = q.code.replace('@@BLANK@@', `[${given||'_'}]`).replace('@@BLANK@@','').replace(/\\n/g,'\n');
     html += `<div class="review-q ${skipped?'skip-q':correct?'correct-q':'wrong-q'}">
-      <div class="review-label ${skipped?'s':correct?'c':'w'}">${skipped?'SKIPPED':correct?'CORRECT':'WRONG'} — FIB Q${i+1}</div>
-      <div class="review-q-text">${i+26}. ${escHtml(q.q)}</div>
+      <div class="review-label ${skipped?'s':correct?'c':'w'}">${skipped?'SKIPPED':correct?'CORRECT':'WRONG'} — CODE Q${i+1}</div>
+      <div class="review-q-text">${i+26}. ${escHtml(q.label)}</div>
       <div class="review-answers">
         ${!skipped ? `<span class="review-your ${correct?'match':''}">Your answer: ${escHtml(given)}</span>` : ''}
         ${!correct ? `<span class="review-correct-ans">Correct answer: ${escHtml(expected)}</span>` : ''}
